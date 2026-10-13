@@ -56,12 +56,18 @@ Add under `config` in the tab manifest or deploy **Arguments** JSON:
 
 (Exact keys depend on Moddable `mc/config`; use DHCP first to validate link.)
 
-## Install (optional npm package)
+## Install
 
 ```bash
 cd ~/.node-red
-npm install file:../Projects/node-red-mcu-w5500
+npm install github:lescurej/node-red-mcu-w5500
 ```
+
+Repo: https://github.com/lescurej/node-red-mcu-w5500
+
+Manifest file after install:
+
+`node_modules/@lescurej/node-red-mcu-w5500/manifests/waveshare-esp32-s3-eth.json`
 
 The package only ships manifest JSON; you still paste it into the MCU tab.
 
