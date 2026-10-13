@@ -1,0 +1,35 @@
+{
+	"include": [
+		"$(MODDABLE)/modules/network/ethernet/manifest.json_w5500"
+	],
+	"platforms": {
+		"esp32": {
+			"modules": {
+				"setup/network": "$(MODDABLE)/modules/network/ethernet/esp32/setup/ethernet"
+			},
+			"preload": [
+				"setup/timezone"
+			]
+		}
+	},
+	"defines": {
+		"ethernet": {
+			"enc28j60": 0,
+			"w5500": 1,
+			"hostname": "\"nodered-mcu\"",
+			"hz": 20000000,
+			"int_pin": 10,
+			"spi": {
+				"command_bits": 16,
+				"address_bits": 8,
+				"cs_pin": 14,
+				"port": "SPI2_HOST",
+				"miso_pin": 12,
+				"mosi_pin": 11,
+				"sck_pin": 13,
+				"polling_ms": 0,
+				"dma_ch": 3
+			}
+		}
+	}
+}
