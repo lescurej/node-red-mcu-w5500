@@ -1,13 +1,14 @@
 {
-	"name": "@lescurej/node-red-mcu-w5500",
-	"version": "1.0.0",
-	"description": "W5500 Ethernet manifest overlay for Node-RED MCU (Waveshare ESP32-S3-ETH)",
+	"name": "@lescurej/node-red-mcu-network",
+	"version": "1.1.0",
+	"description": "Network setup (Wi-Fi, W5500 Ethernet, dual) for Node-RED MCU Edition",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/lescurej/node-red-mcu-w5500.git"
+		"url": "git+https://github.com/lescurej/node-red-mcu-network.git"
 	},
 	"license": "LGPL-3.0-or-later",
 	"files": [
+		"network/",
 		"manifests/",
 		"README.md"
 	],

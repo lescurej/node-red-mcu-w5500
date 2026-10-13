@@ -1,83 +1,58 @@
-# @lescurej/node-red-mcu-w5500
+# @lescurej/node-red-mcu-network
 
-Ethernet (WIZnet W5500) for [Node-RED MCU Edition](https://github.com/phoddie/node-red-mcu) on **Waveshare ESP32-S3-ETH**.
+Network bootstrap for [Node-RED MCU Edition](https://github.com/phoddie/node-red-mcu): **Wi‑Fi**, **Ethernet (W5500)**, or **both**, without mixing board and driver concerns.
 
-## Hardware (on-board W5500)
+## Three layers (do not confuse them)
 
-| Signal | GPIO |
-|--------|------|
-| MOSI   | 11   |
-| MISO   | 12   |
-| SCLK   | 13   |
-| CS     | 14   |
-| INT    | 10   |
-| RST    | 9 (handled by board power-up) |
+| Layer | What it is | Where it lives |
+|--------|------------|----------------|
+| **Driver** | W5500, ENC28J60, internal PHY | Moddable `manifest.json_w5500`, etc. |
+| **Pin profile** | SPI pins for a given wiring | `manifests/profiles/` (e.g. Waveshare ESP32-S3-ETH) |
+| **Board target** | USB, LED, `host/provider`, IDF `sdkconfig` | Moddable `esp32/<target>` (e.g. `waveshare_esp32_s3_eth`) |
 
-WS2812 on GPIO **21** is independent of the Ethernet SPI bus.
+W5500 is **not** your board name. Waveshare ESP32-S3-ETH is **one profile** on top of the W5500 driver.
 
-## Moddable target
+## `setupnetwork.js`
 
-Target directory (must exist under your Moddable install):
+Replaces `setup/network` when included from the MCU tab manifest. Reads `config.network.mode`:
 
-`$MODDABLE/build/devices/esp32/targets/waveshare_esp32_s3_eth/`
+| Mode | Behavior |
+|------|----------|
+| `wifi` | SSID/password from deploy panel |
+| `ethernet` | W5500 (requires driver + pin `defines` in manifest) |
+| `both` | Wi‑Fi and Ethernet in parallel (more RAM) |
+| `auto` (default) | Ethernet if `config.ethernet === true` and no SSID; else Wi‑Fi if SSID set |
 
-### Platform in Node-RED MCU deploy
+Stock Node-RED MCU without this package: Wi‑Fi only via `setupwifi.js`.
 
-Choose **`esp32/waveshare_esp32_s3_eth`** after **restarting Node-RED**.
+## MCU tab manifest
 
-The MCU plugin only lists targets that exist under `$MODDABLE/build/devices/*/targets/` **and** are registered in its platform list. Custom targets were missing from the dropdown until the plugin also adds discovered targets (see note below).
-
-**Fallback:** use **`esp32/esp32s3_cdc`** (USB serial, same as Waveshare) and add this to the tab manifest `build` section:
+1. Set **`build.NRMCU_NETWORK`** to this package path (after `npm install`):
 
 ```json
 "build": {
-  "SDKCONFIGPATH": "$(MODDABLE)/build/devices/esp32/targets/waveshare_esp32_s3_eth/sdkconfig"
+  "NRMCU_NETWORK": "/Users/you/.node-red/node_modules/@lescurej/node-red-mcu-network"
 }
 ```
 
-That enables W5500 in IDF while keeping the CDC subplatform.
+2. Merge a **stack** from `manifests/stacks/` (copy JSON into the tab manifest, same object as `build` above).
 
-## Node-RED MCU tab manifest
+| Stack file | Use case |
+|------------|----------|
+| `wifi-only.json` | Explicit unified setup (same as deploy SSID with mode `wifi`) |
+| `ethernet-w5500-waveshare-esp32-s3-eth.json` | W5500 + Waveshare pinout + mode `ethernet` |
+| `dual-w5500-waveshare-esp32-s3-eth.json` | RJ45 + Wi‑Fi (SSID required in deploy) |
 
-1. Open your **MCU** flow tab → **MCU: manifest.json** edit pane.
-2. Paste the contents of `manifests/waveshare-esp32-s3-eth.json`.
-3. In the MCU deploy panel:
-   - **Platform**: `esp32/waveshare_esp32_s3_eth`
-   - **WiFi SSID / password**: leave **empty** (Ethernet setup skips Wi-Fi; if SSID is set, Moddable Ethernet setup is skipped).
-4. Connect RJ45, build, flash.
+New board with W5500: copy `manifests/profiles/w5500-waveshare-esp32-s3-eth.json`, change only `defines.ethernet.spi` / `int_pin`, add `manifests/stacks/ethernet-w5500-<your-board>.json`.
 
-Serial should show `Starting Ethernet`, then `IP address …` after DHCP.
-
-## Static IP (optional)
-
-Add under `config` in the tab manifest or deploy **Arguments** JSON:
-
-```json
-{
-  "ethernet": {
-    "address": "192.168.1.50",
-    "mask": "255.255.255.0",
-    "gateway": "192.168.1.1"
-  }
-}
-```
-
-(Exact keys depend on Moddable `mc/config`; use DHCP first to validate link.)
+Moddable **platform** remains your board target (`esp32/waveshare_esp32_s3_eth` or `esp32/esp32s3_cdc` + W5500 sdkconfig path).
 
 ## Install
 
 ```bash
 cd ~/.node-red
-npm install github:lescurej/node-red-mcu-w5500
+npm install github:lescurej/node-red-mcu-network
 ```
-
-Repo: https://github.com/lescurej/node-red-mcu-w5500
-
-Manifest file after install:
-
-`node_modules/@lescurej/node-red-mcu-w5500/manifests/waveshare-esp32-s3-eth.json`
-
-The package only ships manifest JSON; you still paste it into the MCU tab.
 
 ## License
 

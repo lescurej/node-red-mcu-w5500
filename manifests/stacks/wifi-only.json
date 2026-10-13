@@ -1,0 +1,17 @@
+{
+	"include": [
+		"$(NRMCU_NETWORK)/network/manifest.json"
+	],
+	"config": {
+		"network": {
+			"mode": "wifi"
+		}
+	},
+	"platforms": {
+		"esp32": {
+			"modules": {
+				"setup/network": "$(NRMCU_NETWORK)/network/setupnetwork"
+			}
+		}
+	}
+}
