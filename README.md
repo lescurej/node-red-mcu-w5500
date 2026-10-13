@@ -17,17 +17,25 @@ WS2812 on GPIO **21** is independent of the Ethernet SPI bus.
 
 ## Moddable target
 
-Use platform:
-
-```text
-esp32/waveshare_esp32_s3_eth
-```
-
-Target files live in your Moddable tree:
+Target directory (must exist under your Moddable install):
 
 `$MODDABLE/build/devices/esp32/targets/waveshare_esp32_s3_eth/`
 
-(SPI Ethernet enabled in `sdkconfig.defaults`.)
+### Platform in Node-RED MCU deploy
+
+Choose **`esp32/waveshare_esp32_s3_eth`** after **restarting Node-RED**.
+
+The MCU plugin only lists targets that exist under `$MODDABLE/build/devices/*/targets/` **and** are registered in its platform list. Custom targets were missing from the dropdown until the plugin also adds discovered targets (see note below).
+
+**Fallback:** use **`esp32/esp32s3_cdc`** (USB serial, same as Waveshare) and add this to the tab manifest `build` section:
+
+```json
+"build": {
+  "SDKCONFIGPATH": "$(MODDABLE)/build/devices/esp32/targets/waveshare_esp32_s3_eth/sdkconfig"
+}
+```
+
+That enables W5500 in IDF while keeping the CDC subplatform.
 
 ## Node-RED MCU tab manifest
 
