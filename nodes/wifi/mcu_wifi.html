@@ -1,0 +1,72 @@
+<script type="text/javascript">
+	RED.nodes.registerType("mcu_wifi", {
+		category: "MCU",
+		color: "#a2aaff",
+		defaults: {
+			name: { value: "" },
+			unifiedSetup: { value: true },
+			moddable_manifest: { value: {} }
+		},
+		inputs: 1,
+		outputs: 1,
+		icon: "font-awesome/fa-wifi",
+		paletteLabel: "WiFi",
+		label: function () {
+			return this.name || "WiFi";
+		},
+		oneditsave: function () {
+			const root = this._nrPkgRoot || "";
+			if (!this.unifiedSetup || !root) {
+				this.moddable_manifest = {
+					config: { network: { mode: "wifi" } }
+				};
+				return;
+			}
+			this.moddable_manifest = {
+				build: { NRMCU_NETWORK: root },
+				include: [
+					root + "/network/manifest.json"
+				],
+				platforms: {
+					esp32: {
+						modules: {
+							"setup/network": root + "/network/setupnetwork"
+						}
+					}
+				},
+				config: {
+					network: { mode: "wifi" }
+				}
+			};
+		},
+		oneditprepare: function () {
+			const node = this;
+			$.getJSON("/lescurej/mcu-network/pkg-root", (data) => {
+				node._nrPkgRoot = data.NRMCU_NETWORK;
+			});
+		}
+	});
+</script>
+
+<script type="text/html" data-template-name="mcu_wifi">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name">
+	</div>
+	<div class="form-row">
+		<label for="node-input-unifiedSetup">&nbsp;</label>
+		<input type="checkbox" id="node-input-unifiedSetup" style="width:auto">
+		<label for="node-input-unifiedSetup" style="width:auto"> Use shared network setup module</label>
+	</div>
+	<p style="margin-left:110px;font-size:small">Set <b>WiFi SSID</b> and password in the MCU deploy panel.</p>
+</script>
+
+<script type="text/markdown" data-help-name="mcu_wifi">
+Enables Wi‑Fi boot (with optional unified `setupnetwork` module).
+
+**Deploy panel:** SSID + password required.
+
+**Input:** any message → outputs `{ connected, ip }` on `msg.payload`.
+
+Works with `mcu_ethernet` when using **dual** mode on the Ethernet node.
+</script>

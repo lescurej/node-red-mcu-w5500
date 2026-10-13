@@ -1,0 +1,124 @@
+<script type="text/javascript">
+	const NR_ETHERNET_PROFILES = {
+		"w5500-waveshare-esp32-s3-eth": {
+			enc28j60: 0,
+			w5500: 1,
+			hostname: "\"nodered-mcu\"",
+			hz: 20000000,
+			int_pin: 10,
+			spi: {
+				command_bits: 16,
+				address_bits: 8,
+				cs_pin: 14,
+				port: "SPI2_HOST",
+				miso_pin: 12,
+				mosi_pin: 11,
+				sck_pin: 13,
+				polling_ms: 0,
+				dma_ch: 3
+			}
+		},
+		"w5500-moddable-reference": {
+			enc28j60: 0,
+			w5500: 1,
+			hostname: "\"Moddable\"",
+			hz: 16000000,
+			int_pin: 14,
+			spi: {
+				command_bits: 16,
+				address_bits: 8,
+				cs_pin: 10,
+				port: "SPI2_HOST",
+				miso_pin: 13,
+				mosi_pin: 11,
+				sck_pin: 12,
+				polling_ms: 0,
+				dma_ch: 3
+			}
+		}
+	};
+
+	RED.nodes.registerType("mcu_ethernet", {
+		category: "MCU",
+		color: "#a2aaff",
+		defaults: {
+			name: { value: "" },
+			profile: { value: "w5500-waveshare-esp32-s3-eth" },
+			mode: { value: "ethernet" },
+			moddable_manifest: { value: {} }
+		},
+		inputs: 1,
+		outputs: 1,
+		icon: "font-awesome/fa-sitemap",
+		paletteLabel: "Ethernet",
+		label: function () {
+			return this.name || "Ethernet";
+		},
+		oneditsave: function () {
+			const root = this._nrPkgRoot || "";
+			const defines = NR_ETHERNET_PROFILES[this.profile];
+			if (!root || !defines) {
+				this.moddable_manifest = {};
+				return;
+			}
+			this.moddable_manifest = {
+				build: { NRMCU_NETWORK: root },
+				include: [
+					"$(MODDABLE)/modules/network/ethernet/manifest.json_w5500",
+					root + "/network/manifest.json"
+				],
+				platforms: {
+					esp32: {
+						modules: {
+							"setup/network": root + "/network/setupnetwork"
+						},
+						preload: ["setup/timezone"]
+					}
+				},
+				config: {
+					ethernet: true,
+					network: { mode: this.mode }
+				},
+				defines: {
+					ethernet: defines
+				}
+			};
+		},
+		oneditprepare: function () {
+			const node = this;
+			$.getJSON("/lescurej/mcu-network/pkg-root", (data) => {
+				node._nrPkgRoot = data.NRMCU_NETWORK;
+			});
+		}
+	});
+</script>
+
+<script type="text/html" data-template-name="mcu_ethernet">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name">
+	</div>
+	<div class="form-row">
+		<label for="node-input-profile">W5500 profile</label>
+		<select id="node-input-profile" style="width:70%">
+			<option value="w5500-waveshare-esp32-s3-eth">Waveshare ESP32-S3-ETH</option>
+			<option value="w5500-moddable-reference">Moddable reference wiring</option>
+		</select>
+	</div>
+	<div class="form-row">
+		<label for="node-input-mode">Boot mode</label>
+		<select id="node-input-mode" style="width:70%">
+			<option value="ethernet">Ethernet only</option>
+			<option value="both">Ethernet + Wi‑Fi (SSID in deploy)</option>
+		</select>
+	</div>
+	<p style="margin-left:110px;font-size:small">Leave deploy <b>SSID empty</b> for Ethernet-only.</p>
+</script>
+
+<script type="text/markdown" data-help-name="mcu_ethernet">
+Adds W5500 Ethernet to the MCU build and reports link status.
+
+**Input:** any message → `{ link, ip, mac }` on `msg.payload`.
+
+**Profile:** SPI pin map for your hardware (not the Moddable board target — set that separately in deploy).
+</script>

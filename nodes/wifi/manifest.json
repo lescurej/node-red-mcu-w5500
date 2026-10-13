@@ -1,0 +1,10 @@
+{
+	"modules": {
+		"*": [
+			"./wifi"
+		]
+	},
+	"preload": [
+		"wifi"
+	]
+}

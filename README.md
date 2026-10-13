@@ -47,12 +47,24 @@ New board with W5500: copy `manifests/profiles/w5500-waveshare-esp32-s3-eth.json
 
 Moddable **platform** remains your board target (`esp32/waveshare_esp32_s3_eth` or `esp32/esp32s3_cdc` + W5500 sdkconfig path).
 
+## Palette nodes (MCU tab)
+
+| Node | Role |
+|------|------|
+| **mcu_wifi** | Wi‑Fi boot via `setupnetwork` + `{ ip, connected }` status |
+| **mcu_ethernet** | W5500 profile + boot mode (`ethernet` / `both`) + link status |
+| **mcu_bluetooth** | Pulls BLE client manifest; use with **BLE scanner / in / out** (Node-RED MCU) |
+
+Drop **one** Ethernet or Wi‑Fi node in the MCU flow (or both for dual). You can remove the manual tab manifest if the node `moddable_manifest` covers your case.
+
 ## Install
 
 ```bash
 cd ~/.node-red
 npm install github:lescurej/node-red-mcu-network
 ```
+
+Restart Node-RED.
 
 ## License
 

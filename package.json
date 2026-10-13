@@ -1,6 +1,6 @@
 {
 	"name": "@lescurej/node-red-mcu-network",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Network setup (Wi-Fi, W5500 Ethernet, dual) for Node-RED MCU Edition",
 	"repository": {
 		"type": "git",
@@ -9,10 +9,20 @@
 	"license": "LGPL-3.0-or-later",
 	"files": [
 		"network/",
+		"nodes/",
+		"lib/",
 		"manifests/",
 		"README.md"
 	],
 	"peerDependencies": {
 		"@ralphwetzel/node-red-mcu-plugin": ">=1.0.0"
+	},
+	"node-red": {
+		"version": ">=3.0.0",
+		"nodes": {
+			"mcu_wifi": "nodes/wifi/mcu_wifi.js",
+			"mcu_ethernet": "nodes/ethernet/mcu_ethernet.js",
+			"mcu_bluetooth": "nodes/bluetooth/mcu_bluetooth.js"
+		}
 	}
 }

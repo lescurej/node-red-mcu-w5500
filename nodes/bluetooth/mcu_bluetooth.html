@@ -1,0 +1,37 @@
+<script type="text/javascript">
+	RED.nodes.registerType("mcu_bluetooth", {
+		category: "MCU",
+		color: "#a2aaff",
+		defaults: {
+			name: { value: "" },
+			moddable_manifest: {
+				value: {
+					include: ["$(NODEREDMCU)/nodes/ble/client/manifest.json"]
+				}
+			}
+		},
+		inputs: 1,
+		outputs: 1,
+		icon: "font-awesome/fa-bluetooth-b",
+		paletteLabel: "Bluetooth",
+		label: function () {
+			return this.name || "Bluetooth";
+		}
+	});
+</script>
+
+<script type="text/html" data-template-name="mcu_bluetooth">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name">
+	</div>
+	<p style="margin-left:110px;font-size:small">Includes the BLE client stack. Add <b>BLE scanner</b>, <b>BLE in</b>, <b>BLE out</b> from the Node-RED MCU palette when available.</p>
+</script>
+
+<script type="text/markdown" data-help-name="mcu_bluetooth">
+Enables Bluetooth Low Energy (central) in the firmware manifest.
+
+Runtime GATT operations use the existing **BLE scanner / BLE device / BLE in / BLE out** node types from Node-RED MCU (same manifest as this node).
+
+This node only pulls the BLE stack into the build and exposes a status ping on input.
+</script>

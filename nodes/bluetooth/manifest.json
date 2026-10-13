@@ -1,0 +1,13 @@
+{
+	"include": [
+		"$(NODEREDMCU)/nodes/ble/client/manifest.json"
+	],
+	"modules": {
+		"*": [
+			"./bluetooth"
+		]
+	},
+	"preload": [
+		"bluetooth"
+	]
+}
